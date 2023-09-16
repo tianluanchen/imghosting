@@ -8,7 +8,7 @@ export default function Logo({ hideTitle }: { hideTitle: boolean }) {
                 height: 64
             }}
         >
-            <img referrerPolicy="no-referrer" src="/logo.jpg" alt="logo image" />
+            <img referrerPolicy="no-referrer" src="./logo.jpg" alt="logo image" />
             {hideTitle ? null : (
                 <Title level={1} style={{ color: theme.useToken().token.colorWhite }}>
                     IMG HOSTING
