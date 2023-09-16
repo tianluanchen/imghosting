@@ -8,7 +8,17 @@ import { t } from "i18next";
 export default function ApiSelect() {
     const apiStore = useApiStore();
     useEffect(() => {
-        document.querySelector(".apis .ant-segmented-item-selected")?.scrollIntoView({
+        const overflowEl = document.querySelector(".apis");
+        const selectedEl = document.querySelector(".apis .ant-segmented-item-selected");
+        if (!overflowEl || !selectedEl) {
+            return;
+        }
+        const overflowElRect = overflowEl.getBoundingClientRect();
+        const selectedElRect = selectedEl.getBoundingClientRect();
+        const distance = selectedElRect.left - overflowElRect.left;
+        const offset = distance - (overflowElRect.width - selectedElRect.width) / 2;
+        overflowEl.scrollBy({
+            left: offset,
             behavior: "smooth"
         });
     }, [apiStore.current]);
