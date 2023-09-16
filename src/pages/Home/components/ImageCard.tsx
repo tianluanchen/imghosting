@@ -160,8 +160,12 @@ export function ImageCard(
     };
 
     function handleCancelUpload() {
-        signalCtrRef.current?.abort();
-        message.warning(t("home.cancelUpload"));
+        if (uploading) {
+            signalCtrRef.current?.abort();
+            message.warning(t("home.cancelUpload"));
+            return true;
+        }
+        return false;
     }
 
     // expose methods
@@ -169,10 +173,10 @@ export function ImageCard(
         ref,
         () => ({
             // if exist url then ignore
-            upload: () => url === null && handleUpload(),
+            upload: () => url === null && !uploading && handleUpload(),
             cancelUpload: handleCancelUpload
         }),
-        [url, authKey, md5Hash]
+        [url, authKey, md5Hash, uploading]
     );
 
     const windowSize = useWindowSize();

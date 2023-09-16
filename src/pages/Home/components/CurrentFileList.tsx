@@ -14,15 +14,21 @@ export default function CurrentFileList({
     const { t } = useTranslation();
     const [closeTip, setCloseTip] = useState(false);
     const message = useGlobalMessage();
-    const imageCardsRef = useRef(new Map<number, { upload: () => any; cancelUpload: () => any }>());
+    const imageCardsRef = useRef(new Map<number, { upload: () => any; cancelUpload: () => boolean }>());
     function handleUploadAll() {
         for (const v of imageCardsRef.current.values()) {
             v.upload();
         }
     }
     function handleCancelUploadAll() {
+        let canceled = false
         for (const v of imageCardsRef.current.values()) {
-            v.cancelUpload();
+            if (v.cancelUpload()) {
+                canceled = true;
+            };
+        }
+        if (!canceled) {
+            message.warning(t("home.noUploadingTasks"));
         }
     }
     function handleDelete(id: number) {
