@@ -12,6 +12,8 @@
 
 [English](./README.md) | 中文
 
+[在线实例](https://tianluanchen.github.io/imghosting)
+
 ## 技术栈
 
 Typescript + React18(Hooks) + React-Router v6(Data Api) + [Zustand](https://github.com/pmndrs/zustand) + [React-i18next](https://github.com/i18next/react-i18next) + [Ant Design](https://github.com/ant-design/ant-design) + [Vite](https://vitejs.dev/)
