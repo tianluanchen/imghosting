@@ -20,7 +20,7 @@ export default {
         const url = body.slice(12, body.length - 4);
         const success = isUrl(url);
         return {
-            url: success ? url : "",
+            url: success ? url : "", // The link will expire after a period of time
             success,
             message: success ? undefined : `Invalid Response: ${body}`
         };
