@@ -9,7 +9,7 @@ type FileManager = {
     uploading: boolean;
     uploadSuccess?: boolean;
     uploadError?: Error;
-    uploadProgress: number; // 0-100
+    uploadProgress: number; // 0.0-1.0
     sign?: AbortController;
 };
 
