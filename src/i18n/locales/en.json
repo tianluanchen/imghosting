@@ -28,7 +28,7 @@
     "home.deleteAllSuccess": "All files deleted",
     "home.tip": "Since React does not support Keep Alive, the content and tasks on this page will be reset when you leave this page.",
     "home.uploadAll": "Upload all files",
-    "home.cancelAll": "Cancel all upload tasks",
+    "home.cancelAll": "Cancel all upload tasks {{countTip}}",
     "home.deleteAll": "Delete all files {{countTip}}",
     "home.authKeyTip": "This interface requires a key",
     "home.sureDeleteAll": "Confirm to delete all files?",
@@ -53,5 +53,9 @@
     "layout.themeToggle": "theme switching",
     "layout.uploadPictures": "Upload Image",
     "layout.history": "History",
-    "home.noUploadingTasks": "There are no tasks being uploaded"
+    "home.noUploadingTasks": "There are no tasks being uploaded",
+    "home.maxFileSizeTip": "File maximum {{size}}",
+    "home.acceptFileTypeTip": "Acceptable file types are: {{type}}",
+    "home.apiTip": "Interface prompt",
+    "home.cancelAllUpload": "All upload tasks canceled"
 }

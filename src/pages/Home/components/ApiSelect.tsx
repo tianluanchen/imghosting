@@ -37,7 +37,7 @@ export default function ApiSelect() {
                             </span>
                         ),
                         value: e.name,
-                        icon: e.useAuthKey ? (
+                        icon: e.handleAuthKey ? (
                             <Tooltip title={t("home.authKeyTip")}>
                                 <LockOutlined />
                             </Tooltip>

@@ -1,64 +1,55 @@
 import { Popover, Card, Alert, Button, Tag, Image, Space, Progress, Spin } from "antd";
-import { calculateFileMD5 } from "@/helpers/hash";
-import http from "@/helpers/http";
-import {
-    type Ref,
-    forwardRef,
-    useImperativeHandle,
-    useEffect,
-    useState,
-    useRef,
-    useMemo
-} from "react";
+import { type Ref, useEffect, useState, useMemo } from "react";
 import { LoadingOutlined } from "@ant-design/icons";
-import useAuthStore from "@/stores/auth";
-import useGlobalMessage from "@/hooks/useGlobalMessage";
 import useWindowSize from "@/hooks/useWindowSize";
 import formatSize from "@/helpers/formatSize";
-import { upload } from "@/helpers/buildApi";
-import useApiStore from "@/stores/api";
 import Result from "./Result";
 import { useTranslation } from "react-i18next";
 export function ImageCard(
     {
         file,
-        onDelete,
-        onUploadFailed,
-        onUploadSuccess
+        url,
+        uploading,
+        uploadProgress,
+        uploadError,
+        uploadSuccess,
+        onUpload,
+        onCancelUpload,
+        onDelete
     }: {
-        file: { value: File; id: number };
+        file: File;
+        url?: string;
+        uploading: boolean;
+        uploadProgress?: number;
+        uploadError?: Error;
+        uploadSuccess?: boolean;
+        onUpload: (...args: any[]) => void;
+        onCancelUpload: (...args: any[]) => void;
         onDelete: (...args: any[]) => void;
-        onUploadFailed?: (error: Error, apiName: string) => void;
-        onUploadSuccess?: (url: string, apiName: string) => void;
     },
     ref: Ref<{
         upload: () => any;
         cancelUpload: () => any;
     }>
 ) {
-    const firendlySize = useMemo(() => formatSize(file.value.size), [file.value]);
-
-    // response  from cloud storage
-    const [url, setUrl] = useState<string | null>(null);
-    // image src
-    const [src, setSrc] = useState<string | null>(null);
-
+    const firendlySize = useMemo(() => formatSize(file.size), [file.size]);
+    const [src, setSrc] = useState<string | null | undefined>(null);
     useEffect(() => {
-        if (url !== null) {
+        if (url) {
             setSrc(url);
             return;
         }
-        const objectUrl = URL.createObjectURL(file.value);
+        const objectUrl = URL.createObjectURL(file);
         setSrc(objectUrl);
         return () => {
             URL.revokeObjectURL(objectUrl);
         };
-    }, [file.value, url]);
+    }, [file, url]);
 
     const [imageSize, setImageSize] = useState<null | { width: number; height: number }>(null);
 
     useEffect(() => {
-        if (src === null) {
+        if (!src) {
             setImageSize(null);
             return;
         }
@@ -74,116 +65,28 @@ export function ImageCard(
         };
     }, [src]);
 
-    const message = useGlobalMessage();
-
-    const signalCtrRef = useRef<AbortController | null>(null);
-    // abort when unmounted
-    useEffect(() => {
-        return () => {
-            signalCtrRef.current?.abort();
-        };
-    }, []);
-
-    const apiStore = useApiStore();
-
-    const authKey = useAuthStore((state) => state.getAuthKey(apiStore.current)) ?? undefined;
-
-    const clearAuthKey = useAuthStore((state) => state.clear);
-
-    const [md5Hash, setMD5Hash] = useState("");
-
-    // compute md5 hash
-    useEffect(() => {
-        let ignore = false;
-        calculateFileMD5(file.value).then((hash) => {
-            if (!ignore) {
-                setMD5Hash(hash);
-            }
-        });
-        return () => {
-            ignore = true;
-        };
-    }, [file.value]);
-
-    const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-
-    const uploading = useMemo(() => uploadProgress !== null, [uploadProgress]);
-
-    const [tip, setTip] = useState<{
-        type: "success" | "error";
-        message: string;
-    } | null>(null);
-
     const { t } = useTranslation();
+    const windowSize = useWindowSize();
 
-    const handleUpload = async () => {
-        signalCtrRef.current?.abort();
-        signalCtrRef.current = new AbortController();
-        setTip(null);
-        setUploadProgress(0);
-        try {
-            const api = apiStore.getApi();
-            const result = await upload(api, {
-                file: file.value,
-                signal: signalCtrRef.current.signal,
-                md5Hash,
-                authKey: api.useAuthKey ? authKey : undefined,
-                onUploadProgress(ratio) {
-                    setUploadProgress(ratio);
-                }
-            });
-            if (result.unauthorized) {
-                clearAuthKey(api.name);
-            }
-            if (!result.success) {
-                throw new Error(result.message || t("home.uploadFailed"));
-            }
-            setUrl(result.url);
-            setTip({
+    const tip = useMemo<null | { type: "success" | "error"; message: string }>(() => {
+        if (uploadSuccess) {
+            return {
                 type: "success",
                 message: t("home.uploadSuccess")
-            });
-            message.success(t("home.uploadSuccess"));
-            onUploadSuccess?.(result.url, apiStore.current);
-        } catch (error) {
-            const err = error as Error;
-            if (!http.isAbortError(err)) {
-                setTip({
-                    type: "error",
-                    message: err.message
-                });
-                message.error(err.message);
-                onUploadFailed?.(err, apiStore.current);
-            }
+            };
+        } else if (uploadError) {
+            return {
+                type: "error",
+                message: uploadError.message || t("home.uploadFailed")
+            };
+        } else {
+            return null;
         }
-        setUploadProgress(null);
-    };
-
-    function handleCancelUpload() {
-        if (uploading) {
-            signalCtrRef.current?.abort();
-            message.warning(t("home.cancelUpload"));
-            return true;
-        }
-        return false;
-    }
-
-    // expose methods
-    useImperativeHandle(
-        ref,
-        () => ({
-            // if exist url then ignore
-            upload: () => url === null && !uploading && handleUpload(),
-            cancelUpload: handleCancelUpload
-        }),
-        [url, authKey, md5Hash, uploading]
-    );
-
-    const windowSize = useWindowSize();
+    }, [uploadError, uploadSuccess]);
 
     const details = (
         <Space direction="vertical">
-            <Tag color="blue">{file.value.type}</Tag>
+            <Tag color="blue">{file.type}</Tag>
             {imageSize ? (
                 <Tag color="cyan">
                     {imageSize.width} × {imageSize.height}
@@ -220,12 +123,12 @@ export function ImageCard(
                             </Popover>
                         )}
                         {uploading ? (
-                            <Button onClick={handleCancelUpload} type="primary">
+                            <Button onClick={onCancelUpload} type="primary">
                                 {t("home.cancel")}
                             </Button>
                         ) : (
-                            <Button onClick={handleUpload} type="primary">
-                                {url !== null ? t("home.reupload") : t("home.upload")}
+                            <Button onClick={onUpload} type="primary">
+                                {url ? t("home.reupload") : t("home.upload")}
                             </Button>
                         )}
                         <Button onClick={onDelete} disabled={uploading} danger>
@@ -241,11 +144,10 @@ export function ImageCard(
                         status="active"
                     />
                 )}
-                {url !== null && <Result url={url} />}
+                {!!url && <Result url={url} />}
             </Space>
         </Card>
     );
 }
 
-const ImageCardWithExport = forwardRef(ImageCard);
-export default ImageCardWithExport;
+export default ImageCard;

@@ -61,8 +61,8 @@ interface UploadApi<T = any> {
     accept?: string;
     /** sort according to the value */
     order?: number;
-    /** self hosted APIs require authkey(SHA256 Hash) */
-    useAuthKey?: boolean;
+    /** self hosted APIs maybe require authkey */
+    handleAuthKey?: (key: string) => string | Promise<string>;
     disabled?: boolean;
     /** sync/async */
     buildRequest: (args: {

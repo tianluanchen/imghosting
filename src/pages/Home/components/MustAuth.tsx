@@ -9,8 +9,8 @@ export default function MustAuth() {
     const setAuthKey = useAuthStore((state) => state.setAuthKey);
     const authKey = useAuthStore((state) => state.getAuthKey(api.name) ?? "");
     const open = useMemo(() => {
-        return authKey === "" && api.useAuthKey;
-    }, [authKey, api.useAuthKey]);
+        return authKey === "" && api.handleAuthKey !== undefined;
+    }, [authKey, api.handleAuthKey]);
 
     const [inputValue, setInputValue] = useState("");
 
@@ -19,11 +19,16 @@ export default function MustAuth() {
             setInputValue("");
         }
     }, [open]);
-
-    const onSet = () => {
+    const [handlingKey, setHandlingKey] = useState(false);
+    const onSet = async () => {
         const value = inputValue.trim();
         if (value.length > 0) {
-            setAuthKey(api.name, value);
+            setHandlingKey(true);
+            setAuthKey(
+                api.name,
+                api.handleAuthKey ? await Promise.resolve(api.handleAuthKey(value)) : value
+            );
+            setHandlingKey(false);
         }
     };
     const { t } = useTranslation();
@@ -42,6 +47,7 @@ export default function MustAuth() {
             open={open}
             footer={[
                 <Button
+                    loading={handlingKey}
                     key="ensure"
                     type="primary"
                     onClick={onSet}
@@ -53,6 +59,7 @@ export default function MustAuth() {
         >
             <Input.Password
                 id="authKey"
+                disabled={handlingKey}
                 onPressEnter={onSet}
                 autoFocus={false}
                 value={inputValue}

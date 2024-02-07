@@ -15,7 +15,6 @@ export type { UploadRecord };
 /** upload records */
 type HistoryStore = {
     history: UploadRecord[];
-    clear: () => void;
     add: (url: string, apiName: string) => void;
     delete: (...urls: string[]) => void;
     deleteAll: () => void;
@@ -25,7 +24,6 @@ const useHistoryStore = create(
     persist(
         immer<HistoryStore>((set) => ({
             history: [],
-            clear: () => set({ history: [] }),
             add: (url, name) => {
                 set(({ history }) => {
                     if (

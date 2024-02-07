@@ -1,11 +1,14 @@
 import type { UploadApi } from "@/types/api";
 import { isUrl } from "@/helpers/buildApi";
+import { calculateSHA256 } from "@/helpers/hash";
 export default {
     title: "Example",
     name: "example",
     order: 0,
     accept: "image/*",
-    useAuthKey: true,
+    handleAuthKey(key) {
+        return calculateSHA256(key);
+    },
     buildRequest({ file, md5Hash, authKey }) {
         return {
             method: "PUT",

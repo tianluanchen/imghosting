@@ -1,8 +1,8 @@
 import { Row, Col, Upload, Space, Alert } from "antd";
-import { useEffect } from "react";
+import { useEffect, useReducer } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import MustAuth from "./components/MustAuth";
-import CurrentFileList from "./components/CurrentFileList";
+import CurrentFileList from "./components/__CurrentFileList";
 import "./index.scss";
 import useGlobalMessage from "@/hooks/useGlobalMessage";
 import ApiSelect from "./components/ApiSelect";
@@ -10,10 +10,37 @@ import useApiStore from "@/stores/api";
 import formatSize from "@/helpers/formatSize";
 import { useTranslation } from "react-i18next";
 import isAcceptdFile from "@/helpers/accept";
-import useFileStore from "@/stores/file";
 const { Dragger } = Upload;
+type Actions =
+    | {
+          type: "added";
+          files: File[];
+      }
+    | {
+          type: "deleted";
+          ids: number[];
+      }
+    | { type: "deletedAll" };
+
+let id = 0;
+
+const currentFilesReducer = (files: { value: File; id: number }[], action: Actions) => {
+    switch (action.type) {
+        case "added":
+            return [...files, ...action.files.map((e) => ({ value: e, id: ++id }))];
+        case "deleted":
+            return files.filter((f) => action.ids.includes(f.id) === false);
+        case "deletedAll":
+            return [];
+        default: {
+            throw Error("unknown action:" + action);
+        }
+    }
+};
+
 export default function Home() {
-    const fileStore = useFileStore();
+    const [files, dispatch] = useReducer(currentFilesReducer, []);
+
     const message = useGlobalMessage();
     const api = useApiStore((store) => store.getApi());
     const { t } = useTranslation();
@@ -30,7 +57,10 @@ export default function Home() {
             );
             return;
         }
-        fileStore.add(file);
+        dispatch({
+            type: "added",
+            files: [file]
+        });
     };
 
     const onBeforeUpload = (file: File) => {
@@ -56,7 +86,7 @@ export default function Home() {
         return () => {
             document.removeEventListener("paste", onPaste);
         };
-    }, [addFile]);
+    }, []);
     const description = (
         <>
             {api.handleAuthKey ? <>{t("home.authKeyTip")},&nbsp;</> : ""}
@@ -102,7 +132,7 @@ export default function Home() {
                     </Space>
                 </Col>
                 <Col lg={12} xs={24}>
-                    <CurrentFileList />
+                    <CurrentFileList files={files} dispatch={dispatch} />
                 </Col>
             </Row>
             <MustAuth />

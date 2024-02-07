@@ -28,7 +28,7 @@
     "home.deleteAllSuccess": "已删除所有文件",
     "home.tip": "由于 React 不支持 Keep Alive ，所以当离开此页面时，此页面上内容和任务都会被重置",
     "home.uploadAll": "上传所有文件",
-    "home.cancelAll": "取消所有上传任务",
+    "home.cancelAll": "取消所有上传任务{{countTip}}",
     "home.deleteAll": "删除所有文件{{countTip}}",
     "home.authKeyTip": "该接口需要提供密钥",
     "home.sureDeleteAll": "确认删除所有文件?",
@@ -53,5 +53,9 @@
     "layout.themeToggle": "主题切换",
     "layout.uploadPictures": "上传图片",
     "layout.history": "历史记录",
-    "home.noUploadingTasks": "没有上传中的任务"
+    "home.noUploadingTasks": "没有上传中的任务",
+    "home.maxFileSizeTip": "文件最大{{size}}",
+    "home.acceptFileTypeTip": "可接受的文件类型为: {{type}}",
+    "home.apiTip": "接口提示",
+    "home.cancelAllUpload": "已取消所有上传任务"
 }

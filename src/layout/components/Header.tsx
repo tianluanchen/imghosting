@@ -50,7 +50,7 @@ export default function Header({
                 }}
             />
             <Space size={12} style={{ lineHeight: "initial" }}>
-                {api.useAuthKey && (
+                {api.handleAuthKey && (
                     <Popconfirm
                         title={t("layout.ensureResetAuthKey")}
                         onConfirm={() => {
