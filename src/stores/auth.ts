@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { calculateSHA256 } from "@/helpers/hash";
 import { withStorageDOMEvents } from "@/helpers/storageEvt";
 
 type AuthStore = {
