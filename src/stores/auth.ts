@@ -23,8 +23,7 @@ const useAuthStore = create(
             },
             clearAll: () => set({ authKeyMap: {} }),
             setAuthKey: (name, key) =>
-                key.trim() !== "" &&
-                set({ authKeyMap: { ...get().authKeyMap, [name]: calculateSHA256(key) } }),
+                key.trim() !== "" && set({ authKeyMap: { ...get().authKeyMap, [name]: key } }),
             getAuthKey: (name) => get().authKeyMap[name],
             hasAuthKey: (name) => (get().authKeyMap[name] === undefined ? false : true)
         }),
