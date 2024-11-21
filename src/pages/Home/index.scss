@@ -1,0 +1,55 @@
+.image-card {
+    animation: up 0.35s ease-in-out 1 forwards;
+
+    @keyframes up {
+        0% {
+            transform: translateY(20px);
+            opacity: 0.25;
+        }
+
+        100% {
+            transform: translateY(0px);
+            opacity: 1;
+        }
+    }
+
+    .ant-card-body {
+        padding: 18px !important;
+    }
+
+    .ant-image,
+    .ant-image-mask {
+        border-radius: 3px !important;
+    }
+
+    img {
+        border-radius: 3px;
+        width: 120px !important;
+        height: 80px !important;
+        object-fit: contain;
+        background-color: black;
+    }
+}
+
+.apis {
+    max-width: 100%;
+    overflow: auto;
+    margin-bottom: 1rem;
+    background-color: rgb(217, 217, 217);
+
+    .ant-segmented-item-label {
+        transition: color 0.15s;
+    }
+
+    .selected {
+        color: #0085ff;
+    }
+}
+
+html.dark .apis {
+    background-color: rgb(10, 10, 10);
+
+    .selected {
+        color: #339dff;
+    }
+}
