@@ -1,0 +1,14 @@
+.table {
+    .ant-image,
+    .ant-image-mask {
+        border-radius: 3px !important;
+    }
+
+    img {
+        border-radius: 3px;
+        width: 120px !important;
+        height: 80px !important;
+        object-fit: contain;
+        background-color: black;
+    }
+}
